@@ -1,6 +1,5 @@
 package com.example.studylink.common;
 
-import com.example.studylink.course.CourseService;
 import com.example.studylink.group.StudyGroupService;
 import java.util.Map;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -12,12 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
 
     private final CurrentUser currentUser;
-    private final CourseService courseService;
     private final StudyGroupService studyGroupService;
 
-    public HomeController(CurrentUser currentUser, CourseService courseService, StudyGroupService studyGroupService) {
+    public HomeController(CurrentUser currentUser, StudyGroupService studyGroupService) {
         this.currentUser = currentUser;
-        this.courseService = courseService;
         this.studyGroupService = studyGroupService;
     }
 
