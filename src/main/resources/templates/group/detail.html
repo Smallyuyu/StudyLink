@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Group', ~{::main})}">
+<main class="container page-shell">
+    <section class="panel mb-3">
+        <div class="d-flex justify-content-between flex-wrap gap-3">
+            <div>
+                <p class="small-label" th:text="${group.course.code + ' · ' + group.status}">Course</p>
+                <h1 class="h2" th:text="${group.name}">Group</h1>
+                <p class="text-secondary" th:text="${group.description}">Description</p>
+                <div class="small text-secondary">
+                    <span th:text="${group.memberCount()}">1</span>/<span th:text="${group.maxMembers}">4</span> members
+                    · owner <span th:text="${group.owner.displayName}">Owner</span>
+                </div>
+            </div>
+            <div class="d-flex gap-2 align-items-start">
+                <a th:if="${isMember}" class="btn btn-primary" th:href="@{/groups/{id}/chat(id=${group.id})}">Open chat</a>
+                <form th:if="${isOwner && group.status.name() != 'CLOSED'}" th:action="@{/groups/{id}/close(id=${group.id})}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button class="btn btn-outline-secondary" type="submit">Close</button>
+                </form>
+                <form th:if="${isOwner && group.status.name() == 'CLOSED'}" th:action="@{/groups/{id}/reopen(id=${group.id})}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button class="btn btn-outline-primary" type="submit">Reopen</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-3">
+        <div class="col-lg-5">
+            <section class="panel h-100">
+                <h2 class="h5">Members</h2>
+                <ul class="list-group list-group-flush">
+                    <li th:each="membership : ${members}" class="list-group-item px-0">
+                        <strong th:text="${membership.user.displayName}">Name</strong>
+                        <span class="badge text-bg-light" th:text="${membership.role}">ROLE</span>
+                        <div class="text-secondary small" th:text="${membership.user.skillTags}">skills</div>
+                    </li>
+                </ul>
+            </section>
+        </div>
+        <div class="col-lg-7">
+            <section class="panel mb-3" th:if="${!isMember && group.hasOpenSlot()}">
+                <h2 class="h5">Request to join</h2>
+                <form th:action="@{/groups/{id}/join(id=${group.id})}" th:object="${joinRequestForm}" method="post" class="vstack gap-2">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <textarea class="form-control" th:field="*{message}" rows="3" placeholder="Share how you hope to contribute."></textarea>
+                    <button class="btn btn-primary align-self-start" type="submit">Send request</button>
+                </form>
+            </section>
+
+            <section class="panel" th:if="${isOwner}">
+                <h2 class="h5">Pending requests</h2>
+                <div th:if="${#lists.isEmpty(pendingRequests)}" class="empty-state">No pending requests.</div>
+                <div th:each="request : ${pendingRequests}" class="border-bottom py-3">
+                    <div class="d-flex justify-content-between gap-3">
+                        <div>
+                            <strong th:text="${request.requester.displayName}">Requester</strong>
+                            <p class="text-secondary mb-0" th:text="${request.message}">Message</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <form th:action="@{/groups/requests/{id}/approve(id=${request.id})}" method="post">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                <button class="btn btn-sm btn-success" type="submit">Approve</button>
+                            </form>
+                            <form th:action="@{/groups/requests/{id}/decline(id=${request.id})}" method="post">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                <button class="btn btn-sm btn-outline-danger" type="submit">Decline</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel" th:unless="${isOwner}">
+                <h2 class="h5">Goals and Time</h2>
+                <p><span class="small-label">Goals</span><br><span th:text="${group.targetGoals}">goals</span></p>
+                <p class="mb-0"><span class="small-label">Preferred time</span><br><span th:text="${group.preferredTimes}">times</span></p>
+            </section>
+        </div>
+    </div>
+</main>
+</html>
