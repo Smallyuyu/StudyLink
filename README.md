@@ -29,6 +29,22 @@ mvn spring-boot:run
 
 Then open `http://localhost:8080`.
 
+### Windows Java Setup
+
+If Maven reports `release version 21 not supported`, it is using an older JDK. Point `JAVA_HOME` to a JDK 21+ install before running Maven:
+
+```powershell
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-26"
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+mvn -version
+```
+
+`mvn -version` should show Java 21 or newer. To make the setting persistent:
+
+```powershell
+[Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Java\jdk-26", "User")
+```
+
 Demo accounts use the password `password`:
 
 | Email | Role in demo |
