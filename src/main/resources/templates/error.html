@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Error', ~{::main})}">
+<main class="container page-shell">
+    <section class="panel">
+        <p class="small-label">Something needs attention</p>
+        <h1 class="h3" th:text="${status}">Error</h1>
+        <p class="text-secondary" th:text="${message}">The requested action could not be completed.</p>
+        <a class="btn btn-primary" th:href="@{/dashboard}">Back to dashboard</a>
+    </section>
+</main>
+</html>
