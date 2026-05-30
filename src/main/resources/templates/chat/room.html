@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Chat', ~{::main})}">
+<main class="container page-shell">
+    <section class="panel">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <p class="small-label" th:text="${group.course.code}">Course</p>
+                <h1 class="h3" th:text="${group.name + ' Chat'}">Chat</h1>
+            </div>
+            <a class="btn btn-outline-secondary" th:href="@{/groups/{id}(id=${group.id})}">Back to group</a>
+        </div>
+
+        <div id="chatLog" class="chat-log mb-3">
+            <div th:if="${#lists.isEmpty(messages)}" class="empty-state">No messages yet.</div>
+            <div th:each="message : ${messages}" class="chat-message">
+                <div class="d-flex justify-content-between">
+                    <strong th:text="${message.sender.displayName}">Sender</strong>
+                    <span class="small text-secondary" th:text="${message.sentAt}">time</span>
+                </div>
+                <div th:text="${message.content}">Message</div>
+            </div>
+        </div>
+
+        <form id="chatForm" th:action="@{/groups/{id}/chat(id=${group.id})}" th:object="${chatMessageForm}" method="post" class="row g-2">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <div class="col-md-10">
+                <input id="chatContent" class="form-control" th:field="*{content}" autocomplete="off" placeholder="Write a message">
+            </div>
+            <div class="col-md-2 d-grid">
+                <button class="btn btn-primary" type="submit">Send</button>
+            </div>
+        </form>
+    </section>
+
+    <script th:src="@{/webjars/sockjs-client/sockjs.min.js}"></script>
+    <script th:src="@{/webjars/stomp-websocket/stomp.min.js}"></script>
+    <script th:inline="javascript">
+        const groupId = /*[[${group.id}]]*/ 0;
+        const csrfHeader = /*[[${_csrf.headerName}]]*/ "X-CSRF-TOKEN";
+        const csrfToken = /*[[${_csrf.token}]]*/ "";
+        const socket = new SockJS('/ws');
+        const stompClient = Stomp.over(socket);
+        stompClient.debug = null;
+        stompClient.connect({}, () => {
+            stompClient.subscribe('/topic/groups/' + groupId, (frame) => {
+                const message = JSON.parse(frame.body);
+                const log = document.getElementById('chatLog');
+                const empty = log.querySelector('.empty-state');
+                if (empty) {
+                    empty.remove();
+                }
+                const item = document.createElement('div');
+                item.className = 'chat-message';
+                item.innerHTML = '<div class="d-flex justify-content-between"><strong></strong><span class="small text-secondary"></span></div><div></div>';
+                item.querySelector('strong').textContent = message.senderName;
+                item.querySelector('span').textContent = message.sentAt;
+                item.querySelector('div:last-child').textContent = message.content;
+                log.appendChild(item);
+                log.scrollTop = log.scrollHeight;
+            });
+        });
+
+        document.getElementById('chatForm').addEventListener('submit', (event) => {
+            if (!stompClient.connected) {
+                return;
+            }
+            event.preventDefault();
+            const input = document.getElementById('chatContent');
+            const content = input.value.trim();
+            if (!content) {
+                return;
+            }
+            stompClient.send('/app/groups/' + groupId + '/chat', {[csrfHeader]: csrfToken}, JSON.stringify({content}));
+            input.value = '';
+        });
+    </script>
+</main>
+</html>
