@@ -61,7 +61,7 @@ class MatchingServiceTest {
         assertThat(matchingService.recommendGroups(learner))
                 .extracting(result -> result.group().getName())
                 .containsSubsequence(strongMatch.getName(), weakMatch.getName());
-        assertThat(matchingService.recommendGroups(learner).getFirst().reasons())
+        assertThat(matchingService.recommendGroups(learner).get(0).reasons())
                 .anyMatch(reason -> reason.contains("same course"));
     }
 }

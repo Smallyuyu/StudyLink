@@ -13,7 +13,7 @@ StudyLink is a Spring Boot MVP for students who want to find classmates, create 
 
 ## Tech Stack
 
-- Java 21
+- Java 17+
 - Spring Boot 3
 - Spring MVC, Thymeleaf, Bootstrap 5
 - Spring Data JPA, H2
@@ -31,18 +31,18 @@ Then open `http://localhost:8080`.
 
 ### Windows Java Setup
 
-If Maven reports `release version 21 not supported`, it is using an older JDK. Point `JAVA_HOME` to a JDK 21+ install before running Maven:
+If Maven reports `release version 17 not supported`, it is using an older JDK. Point `JAVA_HOME` to a JDK 17+ install before running Maven:
 
 ```powershell
-$env:JAVA_HOME = "C:\Program Files\Java\jdk-26"
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-17"
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 mvn -version
 ```
 
-`mvn -version` should show Java 21 or newer. To make the setting persistent:
+`mvn -version` should show Java 17 or newer. To make the setting persistent:
 
 ```powershell
-[Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Java\jdk-26", "User")
+[Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Java\jdk-17", "User")
 ```
 
 Demo accounts use the password `password`:
