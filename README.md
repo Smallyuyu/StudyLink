@@ -13,7 +13,7 @@ StudyLink is a Spring Boot MVP for students who want to find classmates, create 
 
 ## Tech Stack
 
-- Java 17
+- Java 17+
 - Spring Boot 3
 - Spring MVC, Thymeleaf, Bootstrap 5
 - Spring Data JPA, H2
