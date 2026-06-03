@@ -21,7 +21,7 @@ StudyLink is a Spring Boot MVP for students who want to find classmates, create 
 - Spring WebSocket + STOMP
 - Maven, JUnit 5, AssertJ, Mockito, Spring Boot Test
 
-## Tree
+## Project Tree
 ```powershell
 ├─src
 │  ├─main
