@@ -1,0 +1,84 @@
+:root {
+    --ink: #17202a;
+    --muted: #667085;
+    --line: #d8dee8;
+    --surface: #f6f8fb;
+    --brand: #0f766e;
+    --accent: #b45309;
+    --info: #2563eb;
+}
+
+body {
+    background: var(--surface);
+    color: var(--ink);
+}
+
+.navbar {
+    border-bottom: 1px solid var(--line);
+}
+
+.page-shell {
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+}
+
+.panel {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.25rem;
+}
+
+.hero-band {
+    background: linear-gradient(120deg, #0f766e, #2563eb);
+    color: #fff;
+    padding: 4rem 0;
+}
+
+.hero-band .lead {
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.metric {
+    border-left: 4px solid var(--brand);
+    padding-left: 0.8rem;
+}
+
+.small-label {
+    color: var(--muted);
+    font-size: 0.86rem;
+    text-transform: uppercase;
+}
+
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.tag {
+    background: #eef6f6;
+    border: 1px solid #c9e5e2;
+    border-radius: 999px;
+    color: #0f766e;
+    font-size: 0.82rem;
+    padding: 0.2rem 0.55rem;
+}
+
+.chat-log {
+    max-height: 52vh;
+    overflow-y: auto;
+}
+
+.chat-message {
+    border-bottom: 1px solid var(--line);
+    padding: 0.75rem 0;
+}
+
+.empty-state {
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    color: var(--muted);
+    padding: 1rem;
+    text-align: center;
+}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Matches', ~{::main})}">
+<main class="container page-shell">
+    <div class="mb-4">
+        <p class="small-label">Recommendations</p>
+        <h1 class="h2">Matching Results</h1>
+        <p class="text-secondary">Recommended study groups based on your courses, profile, and availability.</p>
+    </div>
+    <div th:if="${#lists.isEmpty(matches)}" class="empty-state">No recommendations yet. Add courses and profile tags to improve matches.</div>
+    <div class="row g-3">
+        <div th:each="match : ${matches}" class="col-lg-6">
+            <section class="panel h-100">
+                <div class="mb-2">
+                    <span class="small-label" th:text="${match.group.course.code}">Course</span>
+                </div>
+                <h2 class="h5" th:text="${match.group.name}">Group</h2>
+                <p class="text-secondary" th:text="${match.group.description}">Description</p>
+                <ul class="small text-secondary">
+                    <li th:each="reason : ${match.reasons}"
+                        th:text="${reason.startsWith('+') ? reason.substring(reason.indexOf(' ') + 1) : reason}">same course: CS210</li>
+                </ul>
+                <a class="btn btn-sm btn-outline-primary" th:href="@{/groups/{id}(id=${match.group.id})}">Open group</a>
+            </section>
+        </div>
+    </div>
+</main>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Courses', ~{::main})}">
+<main class="container page-shell">
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <p class="small-label">Course catalog</p>
+            <h1 class="h2">Courses</h1>
+        </div>
+        <a class="btn btn-primary" th:href="@{/groups/new}">New group</a>
+    </div>
+    <form th:action="@{/courses}" method="get" class="row g-2 mb-3">
+        <div class="col-md-9">
+            <input class="form-control" type="search" name="q" th:value="${query}" placeholder="Search code or name">
+        </div>
+        <div class="col-md-3 d-grid">
+            <button class="btn btn-outline-primary" type="submit">Search</button>
+        </div>
+    </form>
+    <div class="row g-3">
+        <div th:each="course : ${courses}" class="col-md-6 col-xl-4">
+            <section class="panel h-100">
+                <div class="small-label" th:text="${course.code}">CS501</div>
+                <h2 class="h5" th:text="${course.name}">Course</h2>
+                <p class="text-secondary mb-1" th:text="${course.instructor}">Instructor</p>
+                <p class="text-secondary" th:text="${course.semester}">Semester</p>
+                <a class="btn btn-sm btn-outline-primary" th:href="@{/courses/{id}(id=${course.id})}">Open</a>
+            </section>
+        </div>
+    </div>
+</main>
+</html>

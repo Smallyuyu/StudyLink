@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Home', ~{::main})}">
+<main>
+    <section class="hero-band">
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-7">
+                    <p class="small-label text-white-50">Course-first study matching</p>
+                    <h1 class="display-5 fw-bold">StudyLink</h1>
+                    <p class="lead">Find classmates, form focused study groups, and keep group conversations in one place.</p>
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-light" th:href="@{/register}">Create account</a>
+                        <a class="btn btn-outline-light" th:href="@{/login}">Use demo login</a>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="panel text-dark">
+                        <div class="metric mb-3">
+                            <div class="small-label">Recommendations</div>
+                            <div>Course-aware group suggestions</div>
+                        </div>
+                        <div class="metric mb-3">
+                            <div class="small-label">Demo password</div>
+                            <div><code>password</code></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="container page-shell">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="panel h-100">
+                    <h2 class="h5">Profile Signals</h2>
+                    <p class="text-secondary mb-0">Students describe skills, available time, and learning goals so recommendations have useful context.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel h-100">
+                    <h2 class="h5">Study Groups</h2>
+                    <p class="text-secondary mb-0">Owners create course-linked groups, review join requests, and control open or closed status.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel h-100">
+                    <h2 class="h5">Group Chat</h2>
+                    <p class="text-secondary mb-0">Members use a persisted chat with a STOMP topic available for live updates.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+</html>

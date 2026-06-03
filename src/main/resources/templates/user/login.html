@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Log in', ~{::main})}">
+<main class="container page-shell">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <section class="panel">
+                <p class="small-label">Welcome</p>
+                <h1 class="h3 mb-3">Log in</h1>
+                <div th:if="${param.error}" class="alert alert-danger">Invalid email or password.</div>
+                <div th:if="${param.logout}" class="alert alert-info">You have been logged out.</div>
+                <form th:action="@{/login}" method="post" class="vstack gap-3">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <div>
+                        <label class="form-label" for="username">Email</label>
+                        <input class="form-control" id="username" name="username" type="email" required autofocus>
+                    </div>
+                    <div>
+                        <label class="form-label" for="password">Password</label>
+                        <input class="form-control" id="password" name="password" type="password" required>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Log in</button>
+                </form>
+                <hr>
+                <p class="text-secondary mb-2">Demo users use password <code>password</code>.</p>
+                <div class="small">
+                    <div><code>alice@studylink.test</code></div>
+                    <div><code>ben@studylink.test</code></div>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+</html>

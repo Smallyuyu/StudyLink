@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="shell(pageTitle, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${pageTitle} + ' | StudyLink'">StudyLink</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-white">
+    <div class="container">
+        <a class="navbar-brand fw-bold" th:href="@{/}">StudyLink</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="isAuthenticated()">
+                <li class="nav-item"><a class="nav-link" th:href="@{/dashboard}">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/courses}">Courses</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/groups}">Groups</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/matches}">Matches</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/profile}">Profile</a></li>
+            </ul>
+            <div class="d-flex gap-2 align-items-center">
+                <div sec:authorize="isAuthenticated()" class="d-flex gap-2 align-items-center">
+                    <span class="text-secondary small" sec:authentication="name">user</span>
+                    <form th:action="@{/logout}" method="post" class="m-0">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <button class="btn btn-outline-secondary btn-sm" type="submit">Log out</button>
+                    </form>
+                </div>
+                <div sec:authorize="!isAuthenticated()" class="d-flex gap-2">
+                    <a class="btn btn-outline-secondary btn-sm" th:href="@{/login}">Log in</a>
+                    <a class="btn btn-primary btn-sm" th:href="@{/register}">Register</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-3" th:if="${success}">
+    <div class="alert alert-success" th:text="${success}"></div>
+</div>
+<div class="container mt-3" th:if="${error}">
+    <div class="alert alert-danger" th:text="${error}"></div>
+</div>
+
+<main th:replace="${content}"></main>
+
+<script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

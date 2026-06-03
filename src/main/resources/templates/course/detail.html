@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Course', ~{::main})}">
+<main class="container page-shell">
+    <div class="panel mb-3">
+        <div class="d-flex justify-content-between flex-wrap gap-3">
+            <div>
+                <p class="small-label" th:text="${course.code}">CS501</p>
+                <h1 class="h2" th:text="${course.name}">Course</h1>
+                <p class="text-secondary mb-0" th:text="${course.instructor + ' · ' + course.semester}">Instructor</p>
+            </div>
+            <div class="d-flex align-items-start gap-2">
+                <form th:if="${!enrolled}" th:action="@{/courses/{id}/enroll(id=${course.id})}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button class="btn btn-primary" type="submit">Enroll</button>
+                </form>
+                <span th:if="${enrolled}" class="badge text-bg-success align-self-center">Enrolled</span>
+                <a class="btn btn-outline-primary" th:href="@{/groups/new(courseId=${course.id})}">Create group</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <section class="panel h-100">
+                <h2 class="h5">Classmates</h2>
+                <div th:if="${#lists.isEmpty(classmates)}" class="empty-state">No classmates visible yet.</div>
+                <ul th:unless="${#lists.isEmpty(classmates)}" class="list-group list-group-flush">
+                    <li th:each="classmate : ${classmates}" class="list-group-item px-0">
+                        <strong th:text="${classmate.displayName}">Name</strong>
+                        <div class="text-secondary small" th:text="${classmate.skillTags}">skills</div>
+                    </li>
+                </ul>
+            </section>
+        </div>
+        <div class="col-lg-6">
+            <section class="panel h-100">
+                <h2 class="h5">Study Groups</h2>
+                <div th:if="${#lists.isEmpty(groups)}" class="empty-state">No groups for this course yet.</div>
+                <ul th:unless="${#lists.isEmpty(groups)}" class="list-group list-group-flush">
+                    <li th:each="group : ${groups}" class="list-group-item px-0 d-flex justify-content-between">
+                        <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}">Group</a>
+                        <span class="badge text-bg-light" th:text="${group.status}">OPEN</span>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </div>
+</main>
+</html>
