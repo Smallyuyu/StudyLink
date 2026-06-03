@@ -7,6 +7,7 @@ import com.example.studylink.user.User;
 import com.example.studylink.user.UserRepository;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +36,15 @@ public class StudyGroupService {
     @Transactional(readOnly = true)
     public List<StudyGroup> listGroups() {
         return studyGroupRepository.findAll().stream()
+                .filter(group -> !group.isDeleted())
                 .sorted(Comparator.comparing(group -> group.getCourse().getCode() + group.getName()))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<StudyGroup> listGroupsForCourse(Course course) {
+        return studyGroupRepository.findByCourseOrderByName(course).stream()
+                .filter(group -> !group.isDeleted())
                 .toList();
     }
 
@@ -123,6 +132,7 @@ public class StudyGroupService {
     public void closeGroup(User owner, Long groupId) {
         StudyGroup group = findById(groupId);
         ensureOwner(owner, group);
+        ensureNotDeleted(group);
         group.setStatus(GroupStatus.CLOSED);
     }
 
@@ -130,11 +140,68 @@ public class StudyGroupService {
     public void reopenGroup(User owner, Long groupId) {
         StudyGroup group = findById(groupId);
         ensureOwner(owner, group);
+        ensureNotDeleted(group);
         if (group.memberCount() >= group.getMaxMembers()) {
             group.setStatus(GroupStatus.FULL);
         } else {
             group.setStatus(GroupStatus.OPEN);
         }
+    }
+
+    @Transactional
+    public void deleteGroup(User owner, Long groupId) {
+        StudyGroup group = findById(groupId);
+        ensureOwner(owner, group);
+        group.setStatus(GroupStatus.DELETED);
+        pendingRequests(group).forEach(JoinRequest::decline);
+    }
+
+    @Transactional
+    public void leaveGroup(User user, Long groupId) {
+        User managedUser = managedUser(user);
+        StudyGroup group = findById(groupId);
+        ensureNotDeleted(group);
+        if (isOwner(managedUser, group)) {
+            throw new IllegalStateException("Transfer ownership or delete the group before leaving.");
+        }
+        GroupMembership membership = membershipRepository.findByStudyGroupAndUser(group, managedUser)
+                .orElseThrow(() -> new IllegalStateException("You are not a member of this group."));
+        removeMembership(group, membership);
+    }
+
+    @Transactional
+    public void removeMember(User owner, Long groupId, Long membershipId) {
+        StudyGroup group = findById(groupId);
+        ensureOwner(owner, group);
+        ensureNotDeleted(group);
+        GroupMembership membership = findMembership(membershipId);
+        ensureMembershipInGroup(membership, group);
+        if (Objects.equals(membership.getUser().getId(), group.getOwner().getId())) {
+            throw new IllegalStateException("The group owner cannot be removed.");
+        }
+        removeMembership(group, membership);
+    }
+
+    @Transactional
+    public void transferOwnership(User owner, Long groupId, Long membershipId) {
+        User managedOwner = managedUser(owner);
+        StudyGroup group = findById(groupId);
+        if (!isOwner(managedOwner, group)) {
+            throw new AccessDeniedException("Only the group owner can perform this action.");
+        }
+        ensureNotDeleted(group);
+
+        GroupMembership newOwnerMembership = findMembership(membershipId);
+        ensureMembershipInGroup(newOwnerMembership, group);
+        if (Objects.equals(newOwnerMembership.getUser().getId(), managedOwner.getId())) {
+            throw new IllegalStateException("Choose another member to become the group owner.");
+        }
+
+        GroupMembership currentOwnerMembership = membershipRepository.findByStudyGroupAndUser(group, managedOwner)
+                .orElseThrow(() -> new IllegalStateException("Current owner membership not found."));
+        currentOwnerMembership.setRole(GroupRole.MEMBER);
+        newOwnerMembership.setRole(GroupRole.OWNER);
+        group.transferOwnership(newOwnerMembership.getUser());
     }
 
     @Transactional(readOnly = true)
@@ -144,7 +211,9 @@ public class StudyGroupService {
 
     @Transactional(readOnly = true)
     public List<GroupMembership> membershipsFor(User user) {
-        return membershipRepository.findByUserOrderByJoinedAtDesc(user);
+        return membershipRepository.findByUserOrderByJoinedAtDesc(user).stream()
+                .filter(membership -> !membership.getStudyGroup().isDeleted())
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -154,7 +223,9 @@ public class StudyGroupService {
 
     @Transactional(readOnly = true)
     public List<JoinRequest> requestsFor(User user) {
-        return joinRequestRepository.findByRequesterOrderByCreatedAtDesc(user);
+        return joinRequestRepository.findByRequesterOrderByCreatedAtDesc(user).stream()
+                .filter(request -> !request.getStudyGroup().isDeleted())
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -164,12 +235,17 @@ public class StudyGroupService {
 
     @Transactional(readOnly = true)
     public boolean isOwner(User user, StudyGroup group) {
-        return group.getOwner().equals(user);
+        return user != null && Objects.equals(group.getOwner().getId(), user.getId());
     }
 
     private JoinRequest findRequest(Long requestId) {
         return joinRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Join request not found."));
+    }
+
+    private GroupMembership findMembership(Long membershipId) {
+        return membershipRepository.findById(membershipId)
+                .orElseThrow(() -> new NotFoundException("Group membership not found."));
     }
 
     private User managedUser(User user) {
@@ -179,9 +255,27 @@ public class StudyGroupService {
 
     private void ensureOwner(User user, StudyGroup group) {
         User managedUser = managedUser(user);
-        if (!group.getOwner().equals(managedUser)) {
+        if (!isOwner(managedUser, group)) {
             throw new AccessDeniedException("Only the group owner can perform this action.");
         }
+    }
+
+    private void ensureNotDeleted(StudyGroup group) {
+        if (group.isDeleted()) {
+            throw new IllegalStateException("This group has been deleted.");
+        }
+    }
+
+    private void ensureMembershipInGroup(GroupMembership membership, StudyGroup group) {
+        if (!Objects.equals(membership.getStudyGroup().getId(), group.getId())) {
+            throw new NotFoundException("Group membership not found.");
+        }
+    }
+
+    private void removeMembership(StudyGroup group, GroupMembership membership) {
+        group.getMemberships().remove(membership);
+        membershipRepository.delete(membership);
+        group.markOpenIfSeatAvailable();
     }
 
     private void ensurePending(JoinRequest request) {

@@ -31,6 +31,7 @@ public class StudyGroupController {
     @GetMapping("/groups")
     public String groups(Model model) {
         model.addAttribute("groups", studyGroupService.listGroups());
+        model.addAttribute("currentUser", currentUser.require());
         return "group/list";
     }
 
@@ -110,6 +111,38 @@ public class StudyGroupController {
     public String reopenGroup(@PathVariable Long groupId, RedirectAttributes redirectAttributes) {
         studyGroupService.reopenGroup(currentUser.require(), groupId);
         redirectAttributes.addFlashAttribute("success", "Group reopened.");
+        return "redirect:/groups/" + groupId;
+    }
+
+    @PostMapping("/groups/{groupId}/delete")
+    public String deleteGroup(@PathVariable Long groupId, RedirectAttributes redirectAttributes) {
+        studyGroupService.deleteGroup(currentUser.require(), groupId);
+        redirectAttributes.addFlashAttribute("success", "Group deleted.");
+        return "redirect:/groups";
+    }
+
+    @PostMapping("/groups/{groupId}/leave")
+    public String leaveGroup(@PathVariable Long groupId, RedirectAttributes redirectAttributes) {
+        studyGroupService.leaveGroup(currentUser.require(), groupId);
+        redirectAttributes.addFlashAttribute("success", "You left the group.");
+        return "redirect:/groups";
+    }
+
+    @PostMapping("/groups/{groupId}/members/{membershipId}/remove")
+    public String removeMember(@PathVariable Long groupId,
+            @PathVariable Long membershipId,
+            RedirectAttributes redirectAttributes) {
+        studyGroupService.removeMember(currentUser.require(), groupId, membershipId);
+        redirectAttributes.addFlashAttribute("success", "Member removed.");
+        return "redirect:/groups/" + groupId;
+    }
+
+    @PostMapping("/groups/{groupId}/members/{membershipId}/transfer-owner")
+    public String transferOwner(@PathVariable Long groupId,
+            @PathVariable Long membershipId,
+            RedirectAttributes redirectAttributes) {
+        studyGroupService.transferOwnership(currentUser.require(), groupId, membershipId);
+        redirectAttributes.addFlashAttribute("success", "Group owner transferred.");
         return "redirect:/groups/" + groupId;
     }
 }

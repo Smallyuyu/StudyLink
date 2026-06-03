@@ -64,6 +64,10 @@ public class GroupMembership {
         return joinedAt;
     }
 
+    public void setRole(GroupRole role) {
+        this.role = role;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

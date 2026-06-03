@@ -35,9 +35,9 @@
         <div class="col-lg-6">
             <section class="panel h-100">
                 <h2 class="h5">Study Groups</h2>
-                <div th:if="${#sets.isEmpty(course.studyGroups)}" class="empty-state">No groups for this course yet.</div>
-                <ul th:unless="${#sets.isEmpty(course.studyGroups)}" class="list-group list-group-flush">
-                    <li th:each="group : ${course.studyGroups}" class="list-group-item px-0 d-flex justify-content-between">
+                <div th:if="${#lists.isEmpty(groups)}" class="empty-state">No groups for this course yet.</div>
+                <ul th:unless="${#lists.isEmpty(groups)}" class="list-group list-group-flush">
+                    <li th:each="group : ${groups}" class="list-group-item px-0 d-flex justify-content-between">
                         <a th:href="@{/groups/{id}(id=${group.id})}" th:text="${group.name}">Group</a>
                         <span class="badge text-bg-light" th:text="${group.status}">OPEN</span>
                     </li>

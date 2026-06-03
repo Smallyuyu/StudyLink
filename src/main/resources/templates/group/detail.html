@@ -12,15 +12,25 @@
                     · owner <span th:text="${group.owner.displayName}">Owner</span>
                 </div>
             </div>
-            <div class="d-flex gap-2 align-items-start">
-                <a th:if="${isMember}" class="btn btn-primary" th:href="@{/groups/{id}/chat(id=${group.id})}">Open chat</a>
-                <form th:if="${isOwner && group.status.name() != 'CLOSED'}" th:action="@{/groups/{id}/close(id=${group.id})}" method="post">
+            <div class="d-flex flex-wrap gap-2 align-items-start">
+                <a th:if="${isMember && group.status.name() != 'DELETED'}" class="btn btn-primary" th:href="@{/groups/{id}/chat(id=${group.id})}">Open chat</a>
+                <form th:if="${isMember && !isOwner && group.status.name() != 'DELETED'}" th:action="@{/groups/{id}/leave(id=${group.id})}" method="post"
+                      onsubmit="return confirm('Leave this group?');">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button class="btn btn-outline-danger" type="submit">Leave</button>
+                </form>
+                <form th:if="${isOwner && group.status.name() != 'CLOSED' && group.status.name() != 'DELETED'}" th:action="@{/groups/{id}/close(id=${group.id})}" method="post">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <button class="btn btn-outline-secondary" type="submit">Close</button>
                 </form>
                 <form th:if="${isOwner && group.status.name() == 'CLOSED'}" th:action="@{/groups/{id}/reopen(id=${group.id})}" method="post">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <button class="btn btn-outline-primary" type="submit">Reopen</button>
+                </form>
+                <form th:if="${isOwner && group.status.name() != 'DELETED'}" th:action="@{/groups/{id}/delete(id=${group.id})}" method="post"
+                      onsubmit="return confirm('Delete this group?');">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button class="btn btn-outline-danger" type="submit">Delete</button>
                 </form>
             </div>
         </div>
@@ -32,9 +42,28 @@
                 <h2 class="h5">Members</h2>
                 <ul class="list-group list-group-flush">
                     <li th:each="membership : ${members}" class="list-group-item px-0">
-                        <strong th:text="${membership.user.displayName}">Name</strong>
-                        <span class="badge text-bg-light" th:text="${membership.role}">ROLE</span>
-                        <div class="text-secondary small" th:text="${membership.user.skillTags}">skills</div>
+                        <div class="d-flex justify-content-between align-items-start gap-3">
+                            <div>
+                                <strong th:text="${membership.user.displayName}">Name</strong>
+                                <span class="badge text-bg-light" th:text="${membership.role}">ROLE</span>
+                                <div class="text-secondary small" th:text="${membership.user.skillTags}">skills</div>
+                            </div>
+                            <div th:if="${isOwner && membership.user.id != group.owner.id && group.status.name() != 'DELETED'}"
+                                 class="d-flex flex-wrap gap-2 justify-content-end">
+                                <form th:action="@{/groups/{groupId}/members/{membershipId}/transfer-owner(groupId=${group.id}, membershipId=${membership.id})}"
+                                      method="post"
+                                      onsubmit="return confirm('Transfer group admin to this member?');">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <button class="btn btn-sm btn-outline-primary" type="submit">Transfer admin</button>
+                                </form>
+                                <form th:action="@{/groups/{groupId}/members/{membershipId}/remove(groupId=${group.id}, membershipId=${membership.id})}"
+                                      method="post"
+                                      onsubmit="return confirm('Remove this member from the group?');">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Remove</button>
+                                </form>
+                            </div>
+                        </div>
                     </li>
                 </ul>
             </section>

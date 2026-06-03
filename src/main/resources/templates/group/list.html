@@ -21,7 +21,25 @@
                 <div class="small text-secondary mb-3">
                     <span th:text="${group.memberCount()}">1</span>/<span th:text="${group.maxMembers}">4</span> members
                 </div>
-                <a class="btn btn-sm btn-outline-primary" th:href="@{/groups/{id}(id=${group.id})}">Open</a>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/groups/{id}(id=${group.id})}">View</a>
+                    <form th:if="${group.owner.id == currentUser.id && group.status.name() != 'CLOSED'}"
+                          th:action="@{/groups/{id}/close(id=${group.id})}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <button class="btn btn-sm btn-outline-secondary" type="submit">Close</button>
+                    </form>
+                    <form th:if="${group.owner.id == currentUser.id && group.status.name() == 'CLOSED'}"
+                          th:action="@{/groups/{id}/reopen(id=${group.id})}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <button class="btn btn-sm btn-outline-primary" type="submit">Reopen</button>
+                    </form>
+                    <form th:if="${group.owner.id == currentUser.id}"
+                          th:action="@{/groups/{id}/delete(id=${group.id})}" method="post"
+                          onsubmit="return confirm('Delete this group?');">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                    </form>
+                </div>
             </section>
         </div>
     </div>

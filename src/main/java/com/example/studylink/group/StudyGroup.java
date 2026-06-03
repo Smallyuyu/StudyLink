@@ -131,10 +131,24 @@ public class StudyGroup {
         return status == GroupStatus.OPEN && memberCount() < maxMembers;
     }
 
+    public boolean isDeleted() {
+        return status == GroupStatus.DELETED;
+    }
+
     public void markFullIfNeeded() {
         if (memberCount() >= maxMembers) {
             status = GroupStatus.FULL;
         }
+    }
+
+    public void markOpenIfSeatAvailable() {
+        if (status == GroupStatus.FULL && memberCount() < maxMembers) {
+            status = GroupStatus.OPEN;
+        }
+    }
+
+    public void transferOwnership(User owner) {
+        this.owner = owner;
     }
 
     public void setStatus(GroupStatus status) {

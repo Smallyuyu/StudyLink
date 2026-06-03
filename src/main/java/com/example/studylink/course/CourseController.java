@@ -1,6 +1,7 @@
 package com.example.studylink.course;
 
 import com.example.studylink.common.CurrentUser;
+import com.example.studylink.group.StudyGroupService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,10 +14,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class CourseController {
 
     private final CourseService courseService;
+    private final StudyGroupService studyGroupService;
     private final CurrentUser currentUser;
 
-    public CourseController(CourseService courseService, CurrentUser currentUser) {
+    public CourseController(CourseService courseService, StudyGroupService studyGroupService, CurrentUser currentUser) {
         this.courseService = courseService;
+        this.studyGroupService = studyGroupService;
         this.currentUser = currentUser;
     }
 
@@ -33,6 +36,7 @@ public class CourseController {
         model.addAttribute("course", course);
         model.addAttribute("enrolled", courseService.isEnrolled(currentUser.require(), course));
         model.addAttribute("classmates", courseService.classmates(currentUser.require(), courseId));
+        model.addAttribute("groups", studyGroupService.listGroupsForCourse(course));
         return "course/detail";
     }
 
