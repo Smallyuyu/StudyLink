@@ -37,8 +37,27 @@
                         <div class="text-danger small" th:errors="*{targetGoals}"></div>
                     </div>
                     <div>
-                        <label class="form-label" for="preferredTimes">Preferred times</label>
-                        <input class="form-control" id="preferredTimes" th:field="*{preferredTimes}" placeholder="monday, night">
+                        <label class="form-label" for="preferredTimesCustom">Preferred times</label>
+                        <div class="tag-editor" data-tag-editor>
+                            <input type="hidden" th:field="*{preferredTimes}" data-tag-value>
+                            <div class="tag-editor__menu" aria-label="Preferred weekdays and times">
+                                <button class="tag-option" type="button" data-tag-option="monday">Monday</button>
+                                <button class="tag-option" type="button" data-tag-option="tuesday">Tuesday</button>
+                                <button class="tag-option" type="button" data-tag-option="wednesday">Wednesday</button>
+                                <button class="tag-option" type="button" data-tag-option="thursday">Thursday</button>
+                                <button class="tag-option" type="button" data-tag-option="friday">Friday</button>
+                                <button class="tag-option" type="button" data-tag-option="saturday">Saturday</button>
+                                <button class="tag-option" type="button" data-tag-option="sunday">Sunday</button>
+                                <button class="tag-option" type="button" data-tag-option="morning">Morning</button>
+                                <button class="tag-option" type="button" data-tag-option="afternoon">Afternoon</button>
+                                <button class="tag-option" type="button" data-tag-option="night">Night</button>
+                            </div>
+                            <div class="tag-editor__selected" data-tag-selected aria-label="Selected preferred times" aria-live="polite"></div>
+                            <div class="input-group input-group-sm tag-editor__custom">
+                                <input class="form-control" id="preferredTimesCustom" data-tag-custom type="text" autocomplete="off">
+                                <button class="btn btn-outline-secondary" type="button" data-tag-add>Add tag</button>
+                            </div>
+                        </div>
                         <div class="text-danger small" th:errors="*{preferredTimes}"></div>
                     </div>
                     <button class="btn btn-primary" type="submit">Create group</button>
@@ -46,5 +65,6 @@
             </section>
         </div>
     </div>
+    <script th:src="@{/js/tag-input.js}"></script>
 </main>
 </html>

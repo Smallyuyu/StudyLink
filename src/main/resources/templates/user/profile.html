@@ -19,13 +19,57 @@
                         <div class="text-danger small" th:errors="*{department}"></div>
                     </div>
                     <div>
-                        <label class="form-label" for="skillTags">Skill tags</label>
-                        <input class="form-control" id="skillTags" th:field="*{skillTags}" placeholder="python, sql, design">
+                        <label class="form-label" for="skillTagsCustom">Skill tags</label>
+                        <div class="tag-editor" data-tag-editor>
+                            <input type="hidden" th:field="*{skillTags}" data-tag-value>
+                            <div class="tag-editor__menu" aria-label="Suggested skill tags">
+                                <button class="tag-option" type="button" data-tag-option="python">Python</button>
+                                <button class="tag-option" type="button" data-tag-option="sql">SQL</button>
+                                <button class="tag-option" type="button" data-tag-option="java">Java</button>
+                                <button class="tag-option" type="button" data-tag-option="spring">Spring</button>
+                                <button class="tag-option" type="button" data-tag-option="backend">Backend</button>
+                                <button class="tag-option" type="button" data-tag-option="frontend">Frontend</button>
+                                <button class="tag-option" type="button" data-tag-option="design">Design</button>
+                                <button class="tag-option" type="button" data-tag-option="figma">Figma</button>
+                                <button class="tag-option" type="button" data-tag-option="research">Research</button>
+                                <button class="tag-option" type="button" data-tag-option="accessibility">Accessibility</button>
+                                <button class="tag-option" type="button" data-tag-option="algorithms">Algorithms</button>
+                                <button class="tag-option" type="button" data-tag-option="data">Data</button>
+                                <button class="tag-option" type="button" data-tag-option="analytics">Analytics</button>
+                                <button class="tag-option" type="button" data-tag-option="visualization">Visualization</button>
+                                <button class="tag-option" type="button" data-tag-option="product">Product</button>
+                                <button class="tag-option" type="button" data-tag-option="presentation">Presentation</button>
+                            </div>
+                            <div class="tag-editor__selected" data-tag-selected aria-label="Selected skill tags" aria-live="polite"></div>
+                            <div class="input-group input-group-sm tag-editor__custom">
+                                <input class="form-control" id="skillTagsCustom" data-tag-custom type="text" autocomplete="off">
+                                <button class="btn btn-outline-secondary" type="button" data-tag-add>Add tag</button>
+                            </div>
+                        </div>
                         <div class="text-danger small" th:errors="*{skillTags}"></div>
                     </div>
                     <div>
-                        <label class="form-label" for="availableTimes">Available times</label>
-                        <input class="form-control" id="availableTimes" th:field="*{availableTimes}" placeholder="monday, night">
+                        <label class="form-label" for="availableTimesCustom">Available times</label>
+                        <div class="tag-editor" data-tag-editor>
+                            <input type="hidden" th:field="*{availableTimes}" data-tag-value>
+                            <div class="tag-editor__menu" aria-label="Available weekdays and times">
+                                <button class="tag-option" type="button" data-tag-option="monday">Monday</button>
+                                <button class="tag-option" type="button" data-tag-option="tuesday">Tuesday</button>
+                                <button class="tag-option" type="button" data-tag-option="wednesday">Wednesday</button>
+                                <button class="tag-option" type="button" data-tag-option="thursday">Thursday</button>
+                                <button class="tag-option" type="button" data-tag-option="friday">Friday</button>
+                                <button class="tag-option" type="button" data-tag-option="saturday">Saturday</button>
+                                <button class="tag-option" type="button" data-tag-option="sunday">Sunday</button>
+                                <button class="tag-option" type="button" data-tag-option="morning">Morning</button>
+                                <button class="tag-option" type="button" data-tag-option="afternoon">Afternoon</button>
+                                <button class="tag-option" type="button" data-tag-option="night">Night</button>
+                            </div>
+                            <div class="tag-editor__selected" data-tag-selected aria-label="Selected available times" aria-live="polite"></div>
+                            <div class="input-group input-group-sm tag-editor__custom">
+                                <input class="form-control" id="availableTimesCustom" data-tag-custom type="text" autocomplete="off">
+                                <button class="btn btn-outline-secondary" type="button" data-tag-add>Add tag</button>
+                            </div>
+                        </div>
                         <div class="text-danger small" th:errors="*{availableTimes}"></div>
                     </div>
                     <div>
@@ -38,5 +82,6 @@
             </section>
         </div>
     </div>
+    <script th:src="@{/js/tag-input.js}"></script>
 </main>
 </html>
