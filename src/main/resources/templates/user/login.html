@@ -8,11 +8,13 @@
                 <h1 class="h3 mb-3">Log in</h1>
                 <div th:if="${param.error}" class="alert alert-danger">Invalid email or password.</div>
                 <div th:if="${param.logout}" class="alert alert-info">You have been logged out.</div>
-                <form th:action="@{/login}" method="post" class="vstack gap-3">
+                <form th:action="@{/login}" method="post" class="vstack gap-3" id="loginForm" novalidate>
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <div>
                         <label class="form-label" for="username">Email</label>
-                        <input class="form-control" id="username" name="username" type="email" required autofocus>
+                        <input class="form-control" id="username" name="username" type="text" inputmode="email"
+                               autocomplete="username" required autofocus aria-describedby="emailValidationMessages">
+                        <ul class="text-danger small mb-0 mt-1 d-none" id="emailValidationMessages" aria-live="polite"></ul>
                     </div>
                     <div>
                         <label class="form-label" for="password">Password</label>
@@ -29,5 +31,88 @@
             </section>
         </div>
     </div>
+    <script>
+        (() => {
+            const form = document.getElementById('loginForm');
+            const emailInput = document.getElementById('username');
+            const messageList = document.getElementById('emailValidationMessages');
+
+            const validateEmail = (email) => {
+                const messages = [];
+                const atCount = (email.match(/@/g) || []).length;
+                const atIndex = email.indexOf('@');
+                const domain = atIndex >= 0 ? email.slice(atIndex + 1) : '';
+                const lastDotIndex = domain.lastIndexOf('.');
+                const topLevelDomain = lastDotIndex >= 0 ? domain.slice(lastDotIndex + 1) : '';
+
+                if (!email) {
+                    messages.push('請輸入電子郵件。');
+                }
+
+                if (atCount !== 1) {
+                    messages.push('電子郵件必須包含一個、且只能有一個 @ 符號。');
+                }
+
+                if (atIndex === 0) {
+                    messages.push('@ 前面必須有帳號名稱。');
+                }
+
+                if (atIndex === email.length - 1 && atIndex !== -1) {
+                    messages.push('@ 後面必須有郵件伺服器名稱。');
+                }
+
+                if (atCount === 1 && domain && !domain.includes('.')) {
+                    messages.push('@ 後面必須包含點 .，例如 gmail.com。');
+                }
+
+                if (atCount === 1 && domain.includes('.') && !/^[A-Za-z]{2,}$/.test(topLevelDomain)) {
+                    messages.push('最後一個點 . 後面必須是至少 2 個英文字母。');
+                }
+
+                if (/\s/.test(email)) {
+                    messages.push('電子郵件中不能包含任何空白字元。');
+                }
+
+                if (/[^A-Za-z0-9._@-\s]/.test(email)) {
+                    messages.push('電子郵件不能包含特殊符號；只允許英文字母、數字、底線 _、減號 -、點 . 和 @。');
+                }
+
+                return messages;
+            };
+
+            const showMessages = (messages) => {
+                messageList.innerHTML = '';
+                messageList.classList.toggle('d-none', messages.length === 0);
+                emailInput.classList.toggle('is-invalid', messages.length > 0);
+                emailInput.setAttribute('aria-invalid', messages.length > 0);
+
+                messages.forEach((message) => {
+                    const item = document.createElement('li');
+                    item.textContent = message;
+                    messageList.appendChild(item);
+                });
+            };
+
+            emailInput.addEventListener('input', () => {
+                showMessages(validateEmail(emailInput.value));
+            });
+
+            form.addEventListener('submit', (event) => {
+                const messages = validateEmail(emailInput.value);
+                showMessages(messages);
+
+                if (messages.length > 0) {
+                    event.preventDefault();
+                    emailInput.focus();
+                    return;
+                }
+
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    form.reportValidity();
+                }
+            });
+        })();
+    </script>
 </main>
 </html>
